@@ -17,6 +17,6 @@ jobs:
 
       - name: Ping Supabase Project 2
         run: |
-          curl -X GET "${{ secrets.SUPABASE_URL_2 }}/rest/v1/" \
+          curl -X GET "${{ secrets.SUPABASE_URL_2 }}/rest/v1/diagnoses?limit=1" \
           -H "apikey: ${{ secrets.SUPABASE_ANON_KEY_2 }}" \
           -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY_2 }}"
