@@ -1,0 +1,2 @@
+# supabase-keep-alive
+supabaseの一定期間アクセスなしで一時停止するのを防ぐためにアクセス処理をするプロジェクト
