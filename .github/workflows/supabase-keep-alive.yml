@@ -2,7 +2,7 @@ name: Supabase Keep Alive
 
 on:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '0 0 * * *'  # 毎日 UTC 0:00（JST 9:00）
   workflow_dispatch:
 
 jobs:
@@ -10,13 +10,35 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Ping Supabase Project 1
+        id: ping1
         run: |
           curl -X GET "${{ secrets.SUPABASE_URL }}/rest/v1/diagnosis_results?limit=1" \
           -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
           -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}"
 
       - name: Ping Supabase Project 2
+        id: ping2
         run: |
           curl -X GET "${{ secrets.SUPABASE_URL_2 }}/rest/v1/diagnoses?limit=1" \
           -H "apikey: ${{ secrets.SUPABASE_ANON_KEY_2 }}" \
           -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY_2 }}"
+
+      - name: Check if notification day
+        id: check_day
+        run: |
+          DAY=$(TZ='Asia/Tokyo' date +%j)
+          if [ $((DAY % 3)) -eq 0 ]; then
+            echo "notify=true" >> $GITHUB_OUTPUT
+          else
+            echo "notify=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Send Gmail Notification
+        if: steps.check_day.outputs.notify == 'true'
+        run: |
+          curl -s --url 'smtps://smtp.gmail.com:465' \
+          --ssl-reqd \
+          --mail-from '${{ secrets.GMAIL_USER }}' \
+          --mail-rcpt '${{ secrets.GMAIL_USER }}' \
+          --user '${{ secrets.GMAIL_USER }}:${{ secrets.GMAIL_APP_PASSWORD }}' \
+          -T <(echo -e "From: ${{ secrets.GMAIL_USER }}\nTo: ${{ secrets.GMAIL_USER }}\nSubject: Supabase Keep Alive 実行レポート\n\nProject 1: ${{ steps.ping1.outcome }}\nProject 2: ${{ steps.ping2.outcome }}")
