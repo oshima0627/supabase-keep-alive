@@ -2,15 +2,21 @@ name: Supabase Keep Alive
 
 on:
   schedule:
-    - cron: '0 0 * * *'  # 毎日 UTC 0:00（JST 9:00）
-  workflow_dispatch:      # 手動実行ボタンも追加
+    - cron: '0 0 * * *'
+  workflow_dispatch:
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Supabase REST API
+      - name: Ping Supabase Project 1
         run: |
           curl -X GET "${{ secrets.SUPABASE_URL }}/rest/v1/diagnosis_results?limit=1" \
           -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
           -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}"
+
+      - name: Ping Supabase Project 2
+        run: |
+          curl -X GET "${{ secrets.SUPABASE_URL_2 }}/rest/v1/" \
+          -H "apikey: ${{ secrets.SUPABASE_ANON_KEY_2 }}" \
+          -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY_2 }}"
