@@ -26,7 +26,7 @@ jobs:
       - name: Check if notification day
         id: check_day
         run: |
-          DAY=$(TZ='Asia/Tokyo' date +%j)
+          DAY=$(TZ='Asia/Tokyo' date +%-j)
           if [ $((DAY % 3)) -eq 0 ]; then
             echo "notify=true" >> $GITHUB_OUTPUT
           else
